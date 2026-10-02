@@ -8,7 +8,7 @@ ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
 ----------------------------------------------------------------
--- 1. NÚT CHÍNH "cunhankid" (GIỮ NGUYÊN DẠNG VIÊN THUỐC)
+-- 1. NÚT CHÍNH "cunhankid" (FIX CHỮ NHOÈ & ĐỔI MÀU)
 ----------------------------------------------------------------
 local function createPillBtn(name, text, position)
     local btn = Instance.new("TextButton")
@@ -19,7 +19,8 @@ local function createPillBtn(name, text, position)
     btn.BackgroundColor3 = Color3.fromRGB(20, 30, 40)
     btn.BackgroundTransparency = 0.15
     btn.Text = text
-    btn.TextColor3 = Color3.fromRGB(0, 240, 255)
+    -- Đổi chữ thành màu xanh bình thường, không quá chói
+    btn.TextColor3 = Color3.fromRGB(0, 150, 255) 
     btn.TextSize = 13
     btn.Font = Enum.Font.GothamBold
     btn.Active = true
@@ -29,10 +30,13 @@ local function createPillBtn(name, text, position)
     corner.CornerRadius = UDim.new(0.5, 0)
     corner.Parent = btn
     
+    -- Viền của nút chính
     local stroke = Instance.new("UIStroke")
     stroke.Color = Color3.fromRGB(0, 240, 255)
-    stroke.Thickness = 2
-    stroke.Transparency = 0.2
+    stroke.Thickness = 2.5
+    stroke.Transparency = 0
+    -- FIX LỖI NHOÈ CHỮ: Ép viền chỉ áp dụng cho khung Border, không đè lên Text
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border 
     stroke.Parent = btn
 
     return btn
@@ -41,7 +45,7 @@ end
 local MenuToggleBtn = createPillBtn("MenuToggleBtn", "cunhankid", UDim2.new(0.02, 0, 0.15, 0))
 
 ----------------------------------------------------------------
--- 2. NÚT CHỨC NĂNG NỔI (THIẾT KẾ GIỐNG 100% ẢNH MẪU)
+-- 2. NÚT CHỨC NĂNG NỔI
 ----------------------------------------------------------------
 local function createToggleWidget(name, titleText, position)
     -- Thẻ chứa chính
@@ -49,7 +53,7 @@ local function createToggleWidget(name, titleText, position)
     container.Name = name
     container.Parent = ScreenGui
     container.Position = position
-    container.Size = UDim2.new(0, 58, 0, 62)
+    container.Size = UDim2.new(0, 66, 0, 62)
     container.BackgroundColor3 = Color3.fromRGB(15, 25, 35)
     container.BackgroundTransparency = 0.25
     container.Text = ""
@@ -61,23 +65,25 @@ local function createToggleWidget(name, titleText, position)
     corner.CornerRadius = UDim.new(0, 12)
     corner.Parent = container
 
+    -- Viền đậm và sáng hơn cho các nút nổi
     local stroke = Instance.new("UIStroke")
-    stroke.Color = Color3.fromRGB(0, 210, 255)
-    stroke.Thickness = 2
-    stroke.Transparency = 0.1
+    stroke.Color = Color3.fromRGB(0, 230, 255)
+    stroke.Thickness = 2.5 
+    stroke.Transparency = 0
+    stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border -- Ngăn lỗi nhoè áp dụng viền
     stroke.Parent = container
 
-    -- Tên chức năng phía trên (Chữ Cyan)
+    -- Tên chức năng phía trên
     local lbl = Instance.new("TextLabel")
     lbl.Name = "TitleLabel"
     lbl.Parent = container
     lbl.Size = UDim2.new(1, 0, 0, 20)
-    lbl.Position = UDim2.new(0, 0, 0, 5)
+    lbl.Position = UDim2.new(0, 0, 0, 4)
     lbl.BackgroundTransparency = 1
     lbl.Text = titleText
     lbl.TextColor3 = Color3.fromRGB(0, 230, 255)
     lbl.Font = Enum.Font.GothamBold
-    lbl.TextSize = 11
+    lbl.TextSize = 10
 
     -- Khung công tắc gạt (Track)
     local switchTrack = Instance.new("Frame")
@@ -101,7 +107,7 @@ local function createToggleWidget(name, titleText, position)
     knob.Name = "Knob"
     knob.Parent = switchTrack
     knob.Size = UDim2.new(0, 18, 0, 18)
-    knob.Position = UDim2.new(0, 2, 0.5, -9) -- Vị trí mặc định TẮT (Trái)
+    knob.Position = UDim2.new(0, 2, 0.5, -9) 
     knob.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 
     local knobCorner = Instance.new("UICorner")
@@ -111,17 +117,16 @@ local function createToggleWidget(name, titleText, position)
     return container
 end
 
--- Hàm cập nhật trạng thái On/Off cho nút nổi dạng ảnh
 local function setWidgetState(widget, enabled)
     local switchTrack = widget:FindFirstChild("SwitchTrack")
     if switchTrack then
         local knob = switchTrack:FindFirstChild("Knob")
         if knob then
             if enabled then
-                knob.Position = UDim2.new(1, -20, 0.5, -9) -- Sang phải khi BẬT
+                knob.Position = UDim2.new(1, -20, 0.5, -9)
                 switchTrack.BackgroundColor3 = Color3.fromRGB(0, 120, 160)
             else
-                knob.Position = UDim2.new(0, 2, 0.5, -9) -- Sang trái khi TẮT
+                knob.Position = UDim2.new(0, 2, 0.5, -9)
                 switchTrack.BackgroundColor3 = Color3.fromRGB(25, 40, 50)
             end
         end
@@ -130,20 +135,21 @@ end
 
 -- Khởi tạo các nút nổi ngoài màn hình
 local FastSpinBtn     = createToggleWidget("FastSpinBtn", "SPIN", UDim2.new(0.02, 108, 0.15, 0))
-local FastClickBtn    = createToggleWidget("FastClickBtn", "CLICK", UDim2.new(0.02, 172, 0.15, 0))
-local FastJumpBtn     = createToggleWidget("FastJumpBtn", "AT-JUMP", UDim2.new(0.02, 236, 0.15, 0))
-local FastHighJumpBtn = createToggleWidget("FastHighJumpBtn", "HI-JUMP", UDim2.new(0.02, 300, 0.15, 0))
-local FastSpeedBtn    = createToggleWidget("FastSpeedBtn", "SPEED", UDim2.new(0.02, 364, 0.15, 0))
-local FastInteractBtn = createToggleWidget("FastInteractBtn", "LỤM", UDim2.new(0.02, 428, 0.15, 0))
+local FastClickBtn    = createToggleWidget("FastClickBtn", "CLICK", UDim2.new(0.02, 178, 0.15, 0))
+local FastJumpBtn     = createToggleWidget("FastJumpBtn", "AT-JUMP", UDim2.new(0.02, 248, 0.15, 0))
+local FastHighJumpBtn = createToggleWidget("FastHighJumpBtn", "HI-JUMP", UDim2.new(0.02, 318, 0.15, 0))
+local FastSpeedBtn    = createToggleWidget("FastSpeedBtn", "SPEED", UDim2.new(0.02, 388, 0.15, 0))
+local FastInteractBtn = createToggleWidget("FastInteractBtn", "LỤM", UDim2.new(0.02, 458, 0.15, 0))
+local FastAutoTPBtn   = createToggleWidget("FastAutoTPBtn", "AUTO-TP", UDim2.new(0.02, 528, 0.15, 0))
 
 ----------------------------------------------------------------
--- 3. BẢNG MENU CHÍNH (CÓ THANH CUỘN)
+-- 3. BẢNG MENU CHÍNH
 ----------------------------------------------------------------
 MainFrame.Name = "cunhankid_Menu"
 MainFrame.Parent = ScreenGui
 MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-MainFrame.Size = UDim2.new(0, 180, 0, 250)
+MainFrame.Size = UDim2.new(0, 185, 0, 260)
 MainFrame.Active = true
 MainFrame.Draggable = true
 MainFrame.ClipsDescendants = true
@@ -157,7 +163,7 @@ Title.BackgroundTransparency = 1
 Title.Position = UDim2.new(0, 0, 0, 4)
 Title.Size = UDim2.new(1, 0, 0, 22)
 Title.Text = "cunhankid"
-Title.TextColor3 = Color3.fromRGB(0, 240, 255)
+Title.TextColor3 = Color3.fromRGB(0, 150, 255)
 Title.TextSize = 14
 Title.Font = Enum.Font.GothamBold
 
@@ -206,7 +212,7 @@ local function createInputRow(labelText, defaultText, layoutOrder)
     lbl.Parent = rowFrame
     lbl.BackgroundTransparency = 1
     lbl.Position = UDim2.new(0, 0, 0, 0)
-    lbl.Size = UDim2.new(0.6, 0, 1, 0)
+    lbl.Size = UDim2.new(0.65, 0, 1, 0)
     lbl.Text = labelText
     lbl.TextColor3 = Color3.fromRGB(200, 200, 200)
     lbl.TextSize = 11
@@ -215,8 +221,8 @@ local function createInputRow(labelText, defaultText, layoutOrder)
 
     local input = Instance.new("TextBox")
     input.Parent = rowFrame
-    input.Position = UDim2.new(0.62, 0, 0, 0)
-    input.Size = UDim2.new(0.38, 0, 1, 0)
+    input.Position = UDim2.new(0.67, 0, 0, 0)
+    input.Size = UDim2.new(0.33, 0, 1, 0)
     input.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
     input.Text = defaultText
     input.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -235,7 +241,7 @@ end
 local ToggleAFKBtn           = createMenuButton("Anti-AFK: TẮT", 1)
 local DelayInput             = createInputRow("Tốc độ click (s):", "0.1", 2)
 local ToggleClickBtn         = createMenuButton("Auto Click: TẮT", 3)
-local SpinSpeedInput         = createInputRow("Tốc độ xoay:", "10", 4)
+local SpinSpeedInput         = createInputRow("Tốc độ xoay:", "20", 4)
 local ToggleSpinBtn          = createMenuButton("Auto Spin: TẮT", 5)
 local ToggleJumpBtn          = createMenuButton("Auto Jump: TẮT", 6)
 local HighJumpInput          = createInputRow("Độ nhảy cao:", "100", 7)
@@ -244,23 +250,29 @@ local SpeedInput             = createInputRow("Tốc độ chạy:", "50", 9)
 local ToggleSpeedBtn         = createMenuButton("Auto Speed: TẮT", 10) 
 local ToggleInteractBtn      = createMenuButton("Lụm Nhanh (E): TẮT", 11)
 
-local ToggleSpinGuiBtn       = createMenuButton("Nút Spin nổi: HIỆN", 12)
-ToggleSpinGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+-- Auto TP
+local AutoTpInput            = createInputRow("Máu tự TP (%):", "25", 12)
+local ToggleAutoTpBtn        = createMenuButton("Tự Dịch Chuyển: TẮT", 13)
 
-local ToggleClickGuiBtn      = createMenuButton("Nút Click nổi: HIỆN", 13)
-ToggleClickGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+-- Nút hiện/ẩn giao diện nổi
+local ToggleSpinGuiBtn       = createMenuButton("Nút Spin nổi: HIỆN", 14)
+local ToggleClickGuiBtn      = createMenuButton("Nút Click nổi: HIỆN", 15)
+local ToggleJumpGuiBtn       = createMenuButton("Nút Jump nổi: HIỆN", 16)
+local ToggleHighJumpGuiBtn   = createMenuButton("Nút Nhảy Cao nổi: HIỆN", 17)
+local ToggleSpeedGuiBtn      = createMenuButton("Nút Speed nổi: HIỆN", 18) 
+local ToggleInteractGuiBtn   = createMenuButton("Nút Lụm Nhanh nổi: HIỆN", 19) 
+local ToggleAutoTpGuiBtn     = createMenuButton("Nút Auto-TP nổi: HIỆN", 20) 
 
-local ToggleJumpGuiBtn       = createMenuButton("Nút Jump nổi: HIỆN", 14)
-ToggleJumpGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-
-local ToggleHighJumpGuiBtn   = createMenuButton("Nút Nhảy Cao nổi: HIỆN", 15)
-ToggleHighJumpGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-
-local ToggleSpeedGuiBtn      = createMenuButton("Nút Speed nổi: HIỆN", 16) 
-ToggleSpeedGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
-
-local ToggleInteractGuiBtn   = createMenuButton("Nút Lụm Nhanh nổi: HIỆN", 17) 
-ToggleInteractGuiBtn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+local function setDefaultGreen(btn)
+    btn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+end
+setDefaultGreen(ToggleSpinGuiBtn)
+setDefaultGreen(ToggleClickGuiBtn)
+setDefaultGreen(ToggleJumpGuiBtn)
+setDefaultGreen(ToggleHighJumpGuiBtn)
+setDefaultGreen(ToggleSpeedGuiBtn)
+setDefaultGreen(ToggleInteractGuiBtn)
+setDefaultGreen(ToggleAutoTpGuiBtn)
 
 ----------------------------------------------------------------
 -- 4. LOGIC XỬ LÝ CHỨC NĂNG
@@ -272,6 +284,7 @@ local autoJumpEnabled = false
 local highJumpEnabled = false
 local autoSpeedEnabled = false 
 local fastInteractEnabled = false 
+local autoTpEnabled = false
 
 local spinGuiVisible = true
 local clickGuiVisible = true
@@ -279,6 +292,7 @@ local jumpGuiVisible = true
 local highJumpGuiVisible = true
 local speedGuiVisible = true 
 local interactGuiVisible = true 
+local autoTpGuiVisible = true
 
 local vu = game:GetService("VirtualUser")
 local player = game:GetService("Players").LocalPlayer
@@ -292,13 +306,18 @@ local function updateButtonState(button, enabled, textOn, textOff)
     button.Text = enabled and textOn or textOff
 end
 
+-- FIX LỖI SPIN BẬT KHÔNG LÊN: Bảo vệ bằng pcall để script không bị đơ nếu nhân vật chưa load
 local function updateAutoRotate()
-    if player.Character and player.Character:FindFirstChildOfClass("Humanoid") then
-        player.Character:FindFirstChildOfClass("Humanoid").AutoRotate = not spinEnabled
-    end
+    pcall(function()
+        if player.Character then
+            local hum = player.Character:FindFirstChildOfClass("Humanoid")
+            if hum then
+                hum.AutoRotate = not spinEnabled
+            end
+        end
+    end)
 end
 
--- Logic Nhảy Cao Bypass Anti-Cheat
 local function setupHighJumpBypass(character)
     if not character then return end
     local humanoid = character:WaitForChild("Humanoid", 3)
@@ -355,53 +374,52 @@ local function syncInteractState()
     setWidgetState(FastInteractBtn, fastInteractEnabled)
 end
 
+local function syncAutoTpState()
+    updateButtonState(ToggleAutoTpBtn, autoTpEnabled, "Tự Dịch Chuyển: BẬT", "Tự Dịch Chuyển: TẮT")
+    setWidgetState(FastAutoTPBtn, autoTpEnabled)
+end
+
 -- Ẩn/Hiện Menu chính
 MenuToggleBtn.MouseButton1Click:Connect(function()
     MainFrame.Visible = not MainFrame.Visible
     MenuToggleBtn.BackgroundColor3 = MainFrame.Visible and Color3.fromRGB(20, 30, 40) or Color3.fromRGB(60, 70, 80)
 end)
 
--- Ẩn/Hiện các nút nổi từ Menu
+-- Ẩn/Hiện các nút nổi
 ToggleSpinGuiBtn.MouseButton1Click:Connect(function()
-    spinGuiVisible = not spinGuiVisible
-    FastSpinBtn.Visible = spinGuiVisible
+    spinGuiVisible = not spinGuiVisible; FastSpinBtn.Visible = spinGuiVisible
     ToggleSpinGuiBtn.BackgroundColor3 = spinGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleSpinGuiBtn.Text = spinGuiVisible and "Nút Spin nổi: HIỆN" or "Nút Spin nổi: ẨN"
 end)
-
 ToggleClickGuiBtn.MouseButton1Click:Connect(function()
-    clickGuiVisible = not clickGuiVisible
-    FastClickBtn.Visible = clickGuiVisible
+    clickGuiVisible = not clickGuiVisible; FastClickBtn.Visible = clickGuiVisible
     ToggleClickGuiBtn.BackgroundColor3 = clickGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleClickGuiBtn.Text = clickGuiVisible and "Nút Click nổi: HIỆN" or "Nút Click nổi: ẨN"
 end)
-
 ToggleJumpGuiBtn.MouseButton1Click:Connect(function()
-    jumpGuiVisible = not jumpGuiVisible
-    FastJumpBtn.Visible = jumpGuiVisible
+    jumpGuiVisible = not jumpGuiVisible; FastJumpBtn.Visible = jumpGuiVisible
     ToggleJumpGuiBtn.BackgroundColor3 = jumpGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleJumpGuiBtn.Text = jumpGuiVisible and "Nút Jump nổi: HIỆN" or "Nút Jump nổi: ẨN"
 end)
-
 ToggleHighJumpGuiBtn.MouseButton1Click:Connect(function()
-    highJumpGuiVisible = not highJumpGuiVisible
-    FastHighJumpBtn.Visible = highJumpGuiVisible
+    highJumpGuiVisible = not highJumpGuiVisible; FastHighJumpBtn.Visible = highJumpGuiVisible
     ToggleHighJumpGuiBtn.BackgroundColor3 = highJumpGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleHighJumpGuiBtn.Text = highJumpGuiVisible and "Nút Nhảy Cao nổi: HIỆN" or "Nút Nhảy Cao nổi: ẨN"
 end)
-
 ToggleSpeedGuiBtn.MouseButton1Click:Connect(function()
-    speedGuiVisible = not speedGuiVisible
-    FastSpeedBtn.Visible = speedGuiVisible
+    speedGuiVisible = not speedGuiVisible; FastSpeedBtn.Visible = speedGuiVisible
     ToggleSpeedGuiBtn.BackgroundColor3 = speedGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleSpeedGuiBtn.Text = speedGuiVisible and "Nút Speed nổi: HIỆN" or "Nút Speed nổi: ẨN"
 end)
-
 ToggleInteractGuiBtn.MouseButton1Click:Connect(function()
-    interactGuiVisible = not interactGuiVisible
-    FastInteractBtn.Visible = interactGuiVisible
+    interactGuiVisible = not interactGuiVisible; FastInteractBtn.Visible = interactGuiVisible
     ToggleInteractGuiBtn.BackgroundColor3 = interactGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
     ToggleInteractGuiBtn.Text = interactGuiVisible and "Nút Lụm Nhanh nổi: HIỆN" or "Nút Lụm Nhanh nổi: ẨN"
+end)
+ToggleAutoTpGuiBtn.MouseButton1Click:Connect(function()
+    autoTpGuiVisible = not autoTpGuiVisible; FastAutoTPBtn.Visible = autoTpGuiVisible
+    ToggleAutoTpGuiBtn.BackgroundColor3 = autoTpGuiVisible and Color3.fromRGB(50, 150, 50) or Color3.fromRGB(200, 50, 50)
+    ToggleAutoTpGuiBtn.Text = autoTpGuiVisible and "Nút Auto-TP nổi: HIỆN" or "Nút Auto-TP nổi: ẨN"
 end)
 
 -- 1. Anti-AFK
@@ -412,22 +430,11 @@ player.Idled:Connect(function()
         vu:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
     end
 end)
-
-ToggleAFKBtn.MouseButton1Click:Connect(function()
-    antiAfkEnabled = not antiAfkEnabled
-    updateButtonState(ToggleAFKBtn, antiAfkEnabled, "Anti-AFK: BẬT", "Anti-AFK: TẮT")
-end)
+ToggleAFKBtn.MouseButton1Click:Connect(function() antiAfkEnabled = not antiAfkEnabled; updateButtonState(ToggleAFKBtn, antiAfkEnabled, "Anti-AFK: BẬT", "Anti-AFK: TẮT") end)
 
 -- 2. Auto Click
-ToggleClickBtn.MouseButton1Click:Connect(function()
-    autoClickEnabled = not autoClickEnabled
-    syncClickState()
-end)
-
-FastClickBtn.MouseButton1Click:Connect(function()
-    autoClickEnabled = not autoClickEnabled
-    syncClickState()
-end)
+ToggleClickBtn.MouseButton1Click:Connect(function() autoClickEnabled = not autoClickEnabled; syncClickState() end)
+FastClickBtn.MouseButton1Click:Connect(function() autoClickEnabled = not autoClickEnabled; syncClickState() end)
 
 task.spawn(function()
     while true do
@@ -444,15 +451,8 @@ task.spawn(function()
 end)
 
 -- 3. Auto Jump
-ToggleJumpBtn.MouseButton1Click:Connect(function()
-    autoJumpEnabled = not autoJumpEnabled
-    syncJumpState()
-end)
-
-FastJumpBtn.MouseButton1Click:Connect(function()
-    autoJumpEnabled = not autoJumpEnabled
-    syncJumpState()
-end)
+ToggleJumpBtn.MouseButton1Click:Connect(function() autoJumpEnabled = not autoJumpEnabled; syncJumpState() end)
+FastJumpBtn.MouseButton1Click:Connect(function() autoJumpEnabled = not autoJumpEnabled; syncJumpState() end)
 
 task.spawn(function()
     while true do
@@ -470,26 +470,12 @@ task.spawn(function()
 end)
 
 -- 4. Nhảy Cao
-ToggleHighJumpBtn.MouseButton1Click:Connect(function()
-    highJumpEnabled = not highJumpEnabled
-    syncHighJumpState()
-end)
-
-FastHighJumpBtn.MouseButton1Click:Connect(function()
-    highJumpEnabled = not highJumpEnabled
-    syncHighJumpState()
-end)
+ToggleHighJumpBtn.MouseButton1Click:Connect(function() highJumpEnabled = not highJumpEnabled; syncHighJumpState() end)
+FastHighJumpBtn.MouseButton1Click:Connect(function() highJumpEnabled = not highJumpEnabled; syncHighJumpState() end)
 
 -- 5. Auto Speed
-ToggleSpeedBtn.MouseButton1Click:Connect(function()
-    autoSpeedEnabled = not autoSpeedEnabled
-    syncSpeedState()
-end)
-
-FastSpeedBtn.MouseButton1Click:Connect(function()
-    autoSpeedEnabled = not autoSpeedEnabled
-    syncSpeedState()
-end)
+ToggleSpeedBtn.MouseButton1Click:Connect(function() autoSpeedEnabled = not autoSpeedEnabled; syncSpeedState() end)
+FastSpeedBtn.MouseButton1Click:Connect(function() autoSpeedEnabled = not autoSpeedEnabled; syncSpeedState() end)
 
 -- 6. Lụm Nhanh
 local function applyFastInteract()
@@ -509,46 +495,60 @@ local function applyFastInteract()
     end
 end
 
-ToggleInteractBtn.MouseButton1Click:Connect(function()
-    fastInteractEnabled = not fastInteractEnabled
-    syncInteractState()
-    applyFastInteract()
-end)
-
-FastInteractBtn.MouseButton1Click:Connect(function()
-    fastInteractEnabled = not fastInteractEnabled
-    syncInteractState()
-    applyFastInteract()
-end)
+ToggleInteractBtn.MouseButton1Click:Connect(function() fastInteractEnabled = not fastInteractEnabled; syncInteractState(); applyFastInteract() end)
+FastInteractBtn.MouseButton1Click:Connect(function() fastInteractEnabled = not fastInteractEnabled; syncInteractState(); applyFastInteract() end)
 
 workspace.DescendantAdded:Connect(function(v)
     if fastInteractEnabled and v:IsA("ProximityPrompt") then
-        if not v:GetAttribute("OriginalHoldDuration") then
-            v:SetAttribute("OriginalHoldDuration", v.HoldDuration)
-        end
+        if not v:GetAttribute("OriginalHoldDuration") then v:SetAttribute("OriginalHoldDuration", v.HoldDuration) end
         v.HoldDuration = 0
     end
 end)
 
--- 7. Auto Spin & Heartbeat Speed Bypass
-ToggleSpinBtn.MouseButton1Click:Connect(function()
-    spinEnabled = not spinEnabled
-    syncSpinState()
-end)
+-- 7. Tự động dịch chuyển khi máu thấp (Auto TP)
+ToggleAutoTpBtn.MouseButton1Click:Connect(function() autoTpEnabled = not autoTpEnabled; syncAutoTpState() end)
+FastAutoTPBtn.MouseButton1Click:Connect(function() autoTpEnabled = not autoTpEnabled; syncAutoTpState() end)
 
-FastSpinBtn.MouseButton1Click:Connect(function()
-    spinEnabled = not spinEnabled
-    syncSpinState()
-end)
+local debounceTP = false
+local function handleAutoTP()
+    if not autoTpEnabled or debounceTP then return end
+    if player.Character then
+        local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
+        local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+        
+        if humanoid and hrp and humanoid.Health > 0 and humanoid.MaxHealth > 0 then
+            local currentPercent = (humanoid.Health / humanoid.MaxHealth) * 100
+            local targetPercent = tonumber(AutoTpInput.Text) or 25
+            
+            if currentPercent <= targetPercent then
+                debounceTP = true
+                local angle = math.random() * math.pi * 2
+                local distance = math.random(30, 100)
+                local offsetX = math.cos(angle) * distance
+                local offsetZ = math.sin(angle) * distance
+                
+                hrp.CFrame = hrp.CFrame + Vector3.new(offsetX, 50, offsetZ)
+                
+                task.delay(5, function() debounceTP = false end)
+            end
+        end
+    end
+end
+
+-- 8. Vòng lặp Main (Heartbeat) Xử lý Spin, Speed và Auto TP
+ToggleSpinBtn.MouseButton1Click:Connect(function() spinEnabled = not spinEnabled; syncSpinState() end)
+FastSpinBtn.MouseButton1Click:Connect(function() spinEnabled = not spinEnabled; syncSpinState() end)
 
 game:GetService("RunService").Heartbeat:Connect(function(deltaTime)
+    handleAutoTP()
+
     if player.Character then
         local hrp = player.Character:FindFirstChild("HumanoidRootPart")
         local humanoid = player.Character:FindFirstChildOfClass("Humanoid")
         
-        -- Auto Spin
+        -- FIX CHỨC NĂNG SPIN HOẠT ĐỘNG
         if spinEnabled and hrp then
-            local speed = tonumber(SpinSpeedInput.Text) or 10
+            local speed = tonumber(SpinSpeedInput.Text) or 20
             hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(speed), 0)
         end
         
